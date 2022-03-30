@@ -22,15 +22,18 @@ hoteis=[
 ]
 
 class Hoteis(Resource):
+
+    def get(self):
+        return {'hoteis' : hoteis}
+
+
+
+class Hotel(Resource):
     def find_hotel(hotel_id):
         for hotel in hoteis:
             if hotel['hotel_id'] == hotel_id:
                 return hotel
         return None
-    def get(self):
-        return {'hoteis' : hoteis}
-
-class Hotel(Resource):
     argumentos = reqparse.RequestParser()
     argumentos.add_argument('Nome')
     argumentos.add_argument('Estrelas')
@@ -61,5 +64,11 @@ class Hotel(Resource):
 
 
 
-    def delete(self, Id):
-        pass
+    def delete(self, hotel_id):
+        # hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
+        global hoteis
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            hoteis.remove(hotel)
+            return {'message' : 'Hotel deleted'}
+        return {'message' : 'Hotel não encontrado'}
