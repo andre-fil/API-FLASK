@@ -26,7 +26,22 @@ class Hoteis(Resource):
     def get(self):
         return {'hoteis' : hoteis}
 
+class HotelModel:
+    def __init__(self, hotel_id, Nome,Estrelas,Diaria,Cidade):
+        self.hotel_id = hotel_id
+        self.Nome = Nome
+        self.Estrelas = Estrelas
+        self.Diaria = Diaria
+        self.Cidade = Cidade 
 
+    def json(self):
+        return{
+        "hotel_id" : self.hotel_id,
+        "Nome" : self.Nome,
+        "Estrelas" : self.Estrelas,
+        "Diaria" : self.Diaria,
+        "Cidade" : self.Cidade
+        }
 
 class Hotel(Resource):
     def find_hotel(hotel_id):
@@ -48,13 +63,16 @@ class Hotel(Resource):
     def post(self, hotel_id):
 
         dados = Hotel.argumentos.parse_args()
-        novo_hotel = {'hotel_id' : hotel_id, **dados }
+        hotel_objeto = HotelModel(hotel_id, **dados)
+        novo_hotel = hotel_objeto.json()
         hoteis.append(novo_hotel)
         return novo_hotel, 200
 
     def put(self, hotel_id):
         dados = Hotel.argumentos.parse_args()
-        novo_hotel = {'hotel_id' : hotel_id, **dados }
+        #novo_hotel = {'hotel_id' : hotel_id, **dados }
+        hotel_objeto = HotelModel(hotel_id, **dados)
+        novo_hotel = hotel_objeto.json()
         hotel = Hotel.find_hotel(hotel_id)
         if hotel:
             hotel.update(novo_hotel)
