@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from sql_alchemy import banco
-
+#Criando arrays de hotéis (Dicionário/json)
 hoteis=[
 {'hotel_id' : '1',
 'Nome' : 'San Pedro',
@@ -22,12 +22,15 @@ hoteis=[
 }
 ]
 
+#Classe Hoteis - método de retornar os hotéis cadastrados
 class Hoteis(Resource):
 
     def get(self):
         return {'hoteis' : hoteis}
 
+#Classe de modelo hotel
 class HotelModel(banco.Model):
+    #Definindo configurações para cadastro no Banco de Dados
     __tablename__ = 'Hoteis'
     hotel_id = banco.Column(banco.String, primary_key = True)
     Nome = banco.Column(banco.String(80))
@@ -37,7 +40,7 @@ class HotelModel(banco.Model):
 
 
 
-
+    #Definindo parâmetros dos hotéis - atributos
     def __init__(self, hotel_id, Nome,Estrelas,Diaria,Cidade):
         self.hotel_id = hotel_id
         self.Nome = Nome
@@ -45,6 +48,7 @@ class HotelModel(banco.Model):
         self.Diaria = Diaria
         self.Cidade = Cidade
 
+    #Transformando os dados para o formarto Json
     def json(self):
         return{
         "hotel_id" : self.hotel_id,
@@ -54,6 +58,7 @@ class HotelModel(banco.Model):
         "Cidade" : self.Cidade
         }
 
+#Classe Hotel
 class Hotel(Resource):
     #verificando se oum determinado hotel existe no array de hotéis
     def find_hotel(hotel_id):
@@ -68,25 +73,30 @@ class Hotel(Resource):
     argumentos.add_argument('Diaria')
     argumentos.add_argument('Cidade')
 
+    #Retornando o hotel procurado, caso exista
     def get(self, hotel_id):
         if hotel:
             return hotel
         return {'Message' : 'Hotel not found'}, 404
 
+    #Método post - criando novo hotel
     def post(self, hotel_id):
-
+        #Recebendo os dados passados via json e adicionando na var dados
         dados = Hotel.argumentos.parse_args()
+        #Rebendo dados, transformando em json e retornando-o
         hotel_objeto = HotelModel(hotel_id, **dados)
         novo_hotel = hotel_objeto.json()
         hoteis.append(novo_hotel)
         return novo_hotel, 200
 
+    #Método para atualizar ou criar hotel ( caso não exista)
     def put(self, hotel_id):
         dados = Hotel.argumentos.parse_args()
         #novo_hotel = {'hotel_id' : hotel_id, **dados }
         hotel_objeto = HotelModel(hotel_id, **dados)
         novo_hotel = hotel_objeto.json()
         hotel = Hotel.find_hotel(hotel_id)
+        #Verificando se o hotel já existe (atualizar) - ou não ( criar)
         if hotel:
             hotel.update(novo_hotel)
             return novo_hotel, 200
@@ -94,7 +104,7 @@ class Hotel(Resource):
         return novo_hotel, 201
 
 
-
+        #método de deletar hoteis, caso exista
     def delete(self, hotel_id):
         # hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
         global hoteis
