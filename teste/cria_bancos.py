@@ -1,3 +1,4 @@
+"""
 import sqlite3
 
 connection = sqlite3.connect('banco.db')
@@ -12,3 +13,4 @@ cursor.execute(cria_tabela)
 cursor.execute(cria_hotel)
 connection.commit()
 connection.close()
+"""

@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from sql_alchemy import banco
 
 hoteis=[
 {'hotel_id' : '1',
@@ -26,13 +27,23 @@ class Hoteis(Resource):
     def get(self):
         return {'hoteis' : hoteis}
 
-class HotelModel:
+class HotelModel(banco.Model):
+    __tablename__ = 'Hoteis'
+    hotel_id = banco.Column(banco.String, primary_key = True)
+    Nome = banco.Column(banco.String(80))
+    Estrelas = banco.Column(banco.Float(precision=1))
+    Diaria = banco.Column(banco.Float(precision=2))
+    Cidade = banco.Column(banco.String(80))
+
+
+
+
     def __init__(self, hotel_id, Nome,Estrelas,Diaria,Cidade):
         self.hotel_id = hotel_id
         self.Nome = Nome
         self.Estrelas = Estrelas
         self.Diaria = Diaria
-        self.Cidade = Cidade 
+        self.Cidade = Cidade
 
     def json(self):
         return{
@@ -44,11 +55,13 @@ class HotelModel:
         }
 
 class Hotel(Resource):
+    #verificando se oum determinado hotel existe no array de hotéis
     def find_hotel(hotel_id):
         for hotel in hoteis:
             if hotel['hotel_id'] == hotel_id:
                 return hotel
         return None
+    #recebendo argumentos passados pelo método post ou put
     argumentos = reqparse.RequestParser()
     argumentos.add_argument('Nome')
     argumentos.add_argument('Estrelas')
